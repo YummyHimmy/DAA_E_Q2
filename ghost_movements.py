@@ -59,3 +59,11 @@ def find_path(grid, ghost_pos, player_pos):
             if best_path is None or len(path) < len(best_path):
                 best_path = path
     return best_path if best_path else []
+
+def is_player_in_kill_range(grid, ghost_pos, player_pos):
+    """Ghost dapat membunuh jika jarak Chebyshev <= 1, kecuali player di SEALED_FLOOR"""
+    pr, pc = player_pos
+    if grid[pr][pc] == SEALED_FLOOR:
+        return False
+    gr, gc = ghost_pos
+    return max(abs(gr - pr), abs(gc - pc)) <= 1
