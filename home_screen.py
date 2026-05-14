@@ -1,4 +1,3 @@
-#home_screen.py
 import pygame
 import sys
 import random
@@ -47,6 +46,47 @@ class Button:
             and event.button == 1
         )
 
+class Particle:
+    def __init__(self, screen_width, screen_height):
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.reset()
+
+    def reset(self):
+        self.x = random.randint(0, self.screen_width)
+        self.y = random.randint(-self.screen_height, 0)
+
+        self.radius = random.randint(2, 5)
+
+        self.speed = random.uniform(0.5, 2.0)
+
+        self.alpha = random.randint(60, 180)
+
+        self.drift = random.uniform(-0.5, 0.5)
+
+    def update(self):
+        self.y += self.speed
+        self.x += self.drift
+
+        if self.y > self.screen_height:
+            self.reset()
+            self.y = random.randint(-100, -10)
+
+    def draw(self, screen):
+        surface = pygame.Surface(
+            (self.radius * 4, self.radius * 4),
+            pygame.SRCALPHA
+        )
+
+        pygame.draw.circle(
+            surface,
+            (80, 255, 120, self.alpha),
+            (self.radius * 2, self.radius * 2),
+            self.radius
+        )
+
+        screen.blit(surface, (self.x, self.y))
+
 class HomeScreen:
     def __init__(self, screen_width, screen_height):
         self.screen_width = screen_width
@@ -86,6 +126,11 @@ class HomeScreen:
             button_width, button_height, "START GAME", 
             color=(15, 115, 25), hover_color=(25, 125, 35)
         )
+
+        self.particles = [
+            Particle(screen_width, screen_height)
+            for _ in range(80)
+        ]
         
     def run(self, screen):
         while self.running and not self.start_game:
@@ -127,7 +172,11 @@ class HomeScreen:
                 elif self.start_button.is_clicked(mouse_pos, event) and self.selected_difficulty:
                     self.start_game = True
             
-            screen.fill((15, 15, 25))# Dark blue 
+            screen.fill((15, 15, 25))
+
+            for particle in self.particles:
+                particle.update()
+                particle.draw(screen)
                 
             self.title_font = pygame.font.SysFont("chiller", 70, bold=True)
             title = self.title_font.render("EXORCIZE", True, (180, 60, 60))
