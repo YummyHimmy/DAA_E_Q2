@@ -75,11 +75,46 @@ while state.running:
 
     if player_done and not movement.is_moving and state.turn_state != WIN_SCREEN:
         state.turn_state = GHOST_MOVING
-        #TODO: bikin path buat ghost
+        
+        full_path = find_path(state.grid, state.ghost_pos, state.player_pos)
+        if full_path:
+            state.ghost_path = full_path[:GHOST_MAX_STEPS]
+        else:
+            state.ghost_path = []
+
+        state.ghost_step_index = 0
+        state.ghost_last_move_time = pygame.time.get_ticks()
+
+    GHOST_TURN_DELAY = 540 
 
     if state.turn_state == GHOST_MOVING:
-        #TODO: bikin pergerakan ghost
-        state.turn_state = PLAYER_PLANNING
+        now = pygame.time.get_ticks()
+
+        if state.ghost_step_index < len(state.ghost_path):
+            if now - state.ghost_last_move_time >= GHOST_STEP_DELAY:
+                next_pos = state.ghost_path[state.ghost_step_index]
+                rr, cc = next_pos
+                
+                if state.grid[rr][cc] == SEALED_FLOOR:
+                    state.ghost_path = []
+                else:
+                    state.ghost_pos = next_pos
+                    state.ghost_step_index += 1
+                    state.ghost_last_move_time = now
+
+                if is_player_in_kill_range(
+                    state.grid,
+                    state.ghost_pos,
+                    state.player_pos
+                ):
+                    if state.end_screen_start is None:
+                        state.end_screen_start = time.time()
+
+                    state.turn_state = GAME_OVER
+    
+        else:
+            state.turn_state = PLAYER_PLANNING
+            state.ghost_path = []
         
     screen.fill((0,0,0))
     draw(screen, movement, state, assets)
