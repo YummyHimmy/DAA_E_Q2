@@ -86,8 +86,6 @@ while state.running:
         state.ghost_step_index = 0
         state.ghost_last_move_time = pygame.time.get_ticks()
 
-    GHOST_TURN_DELAY = 540 
-
     if state.turn_state == GHOST_MOVING:
         now = pygame.time.get_ticks()
 
