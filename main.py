@@ -8,6 +8,7 @@ from movement import Controller
 from game_state import GameState
 from asset_load import load_all_assets
 from renderer import draw, draw_game_over, draw_win_screen
+from ghost_movements import find_path, is_player_in_kill_range
 
 pygame.init()
 screen = pygame.display.set_mode((
